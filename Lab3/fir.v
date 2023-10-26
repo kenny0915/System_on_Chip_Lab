@@ -245,56 +245,6 @@ module fir
     
 // axi_stream:ss
     assign ss_tready = (init_addr != 6'd44 || cnt_x == 4'd0) ? 1'b1 : 1'b0;
-    
-// axi_stream:ss finite state machine
-    reg ss_state;
-    reg ss_next_state;
-    reg ss_idle;
-    
-    always @* begin
-        case (ss_state)
-        `SS_IDLE:
-        begin
-            if (ss_tlast == 1) begin
-                ss_next_state = `SS_DONE;
-                ss_idle = 1;
-            end
-            else begin
-                ss_next_state = `SS_IDLE;
-                ss_idle = 1;
-            end
-        end
-        `SS_DONE:
-        begin
-            if (ss_tvalid == 1) begin
-                ss_next_state = `SS_IDLE;
-                ss_idle = 1;
-            end
-            else begin
-                ss_next_state = `SS_DONE;
-                ss_idle = 0;
-            end
-        end
-        default:
-        begin
-            if (ss_tvalid == 1) begin
-                ss_next_state = `SS_IDLE;
-                ss_idle = 1;
-            end
-            else begin
-                ss_next_state = `SS_DONE;
-                ss_idle = 0;
-            end
-        end
-        endcase
-    end
-    
-    always @(posedge axis_clk or negedge axis_rst_n) begin
-        if (!axis_rst_n)
-            ss_state <= `SS_DONE;
-        else
-            ss_state <= ss_next_state;
-    end
 // data_RAM
 
     reg  [(pDATA_WIDTH-1):0] data_ff;
